@@ -2,7 +2,9 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -435,6 +437,26 @@ public class QuerydslBasicTest {
                 .from(member)
                 .fetch();
         result.forEach(s -> log.info("s={}", s));
+    }
+
+    @Test
+    public void constant(){
+        queryFactory
+                .select(member.username, Expressions.constant("A"))
+                .from(member)
+                .fetch()
+        .forEach(t -> log.info("tuple={}", t));
+    }
+
+    @Test
+    public void concat(){
+        //{username}_{age}
+        queryFactory
+                .select(member.username.concat("_").concat(member.age.stringValue()))
+                .from(member)
+                .where(member.username.eq("member1"))
+                .fetch()
+        .forEach(s->log.info("s={}",s));
     }
 
 }
