@@ -119,9 +119,9 @@ public class QuerydslBasicTest {
                 .fetch();
 
         //단 건
-        Member fetchOne = queryFactory
-                .selectFrom(QMember.member)
-                .fetchOne();
+//        Member fetchOne = queryFactory
+//                .selectFrom(QMember.member)
+//                .fetchOne();
 
         //처음 한 건 조회
         Member fetchFirst = queryFactory
@@ -557,7 +557,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void findDtoByQueryProjection(){
+    public void findDtoByQueryProjection() {
         List<MemberDto> result = queryFactory
                 .select(new QMemberDto(member.username, member.age))
                 .from(member)
@@ -566,13 +566,14 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void dynamicQuery_BooleanBuilder(){
+    public void dynamicQuery_BooleanBuilder() {
         String usernameParam = "member1";
         Integer ageParam = null;
 
         List<Member> result = searchMember1(usernameParam, ageParam);
         assertThat(result.size()).isEqualTo(1);
     }
+
     private List<Member> searchMember1(String usernameCond, Integer ageCond) {
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -590,7 +591,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void dynamicQuery_WhereParam(){
+    public void dynamicQuery_WhereParam() {
         String usernameParam = "member1";
         Integer ageParam = null;
 
@@ -601,7 +602,7 @@ public class QuerydslBasicTest {
     private List<Member> searchMember2(String usernameCond, Integer ageCond) {
         return queryFactory
                 .selectFrom(member)
-                .where(usernameEq(usernameCond),ageEq(ageCond))
+                .where(usernameEq(usernameCond), ageEq(ageCond))
                 .fetch();
 
     }
@@ -616,7 +617,7 @@ public class QuerydslBasicTest {
 
     //광고 상태 isValid, 날짜가 IN : isServiceable
 
-    private Predicate allEq(String usernameCond, Integer ageCond){
+    private Predicate allEq(String usernameCond, Integer ageCond) {
         return usernameEq(usernameCond).and(ageEq(ageCond));
     }
 
@@ -626,7 +627,7 @@ public class QuerydslBasicTest {
      * 바뀌기 전인 값을 가지고 있다.
      */
     @Test
-    public void bulkUpdate(){
+    public void bulkUpdate() {
 
         //member1 = 10 -> DB member1
         //member2 - 20 -> DB member2
@@ -650,11 +651,11 @@ public class QuerydslBasicTest {
         queryFactory
                 .selectFrom(member)
                 .fetch()
-        .forEach(m -> log.info("username={}",m.getUsername()));
+                .forEach(m -> log.info("username={}", m.getUsername()));
     }
 
     @Test
-    public void bulkAdd(){
+    public void bulkAdd() {
         long count = queryFactory
                 .update(member)
                 .set(member.age, member.age.add(1))
@@ -662,10 +663,33 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void bulkDelete(){
+    public void bulkDelete() {
         long count = queryFactory
                 .delete(member)
                 .where(member.age.gt(18))
                 .execute();
+    }
+
+    @Test
+    public void sqlFunction() {
+        // H2Dialect에만 replace가 있음
+        List<String> result = queryFactory
+                .select(Expressions.stringTemplate("function('replace', {0}, {1},{2})", member.username, "member", "M"))
+                .from(member)
+                .fetch();
+        log.info("result={}", result);
+    }
+
+    @Test
+    public void sqlFunction2(){
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+//                .where(member.username.eq(
+//                        Expressions.stringTemplate("functio('lower',{0}", member.username)))
+                .where(member.username.eq(member.username.lower()))
+                .fetch();
+
+        result.forEach(s -> log.info("s={}", s));
     }
 }
