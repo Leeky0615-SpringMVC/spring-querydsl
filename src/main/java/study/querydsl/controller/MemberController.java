@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import study.querydsl.dto.MemberSearchCond;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.repository.MemberJpaRepository;
+import study.querydsl.repository.MemberRepository;
 
 import java.util.List;
 
@@ -16,13 +17,16 @@ import java.util.List;
 public class MemberController {
 
     private final MemberJpaRepository memberJpaRepository;
+    private final MemberRepository memberRepository;
+
 
     @GetMapping("/v1/members")
     public List<MemberTeamDto> searchMemberV1(MemberSearchCond condition) {
-        log.info("condition={}", condition.getUsername());
-        log.info("condition={}", condition.getTeamName());
-        log.info("condition={}", condition.getAgeGoe());
-        log.info("condition={}", condition.getAgeLoe());
         return memberJpaRepository.search(condition);
+    }
+
+    @GetMapping("/v2/members")
+    public List<MemberTeamDto> searchMemberV2(MemberSearchCond condition) {
+        return memberRepository.search(condition);
     }
 }
