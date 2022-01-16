@@ -2,6 +2,9 @@ package study.querydsl.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import study.querydsl.dto.MemberSearchCond;
@@ -28,5 +31,15 @@ public class MemberController {
     @GetMapping("/v2/members")
     public List<MemberTeamDto> searchMemberV2(MemberSearchCond condition) {
         return memberRepository.search(condition);
+    }
+
+    @GetMapping("/v3/members")
+    public Page<MemberTeamDto> searchMemberV3(MemberSearchCond condition, Pageable pageable) {
+        return memberRepository.searchPageSimple(condition, pageable);
+    }
+
+    @GetMapping("/v4/members")
+    public Page<MemberTeamDto> searchMemberV4(MemberSearchCond condition, Pageable pageable) {
+        return memberRepository.searchPageComplex(condition, pageable);
     }
 }
